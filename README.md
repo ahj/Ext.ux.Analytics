@@ -1,7 +1,7 @@
 Ext.ux.KISSmetrics
 ==================
 
-A light wrapper around the KISSmetrics API for use in an ExtJS application.
+A light wrapper around the [KISSmetrics](http://kissmetrics.com/) API for use in an ExtJS application.
 Exposes KISSmetrics API in a ExtJS-friendly way providing simple functions to integrate with your apps.
 Provides a config 'KISSmetrics' on the main application to configure the API key and optionally a list of all the KISSmetrics events you define (this will be used eventually to provide warnings when you record an event that wasn't defined).
 
@@ -28,3 +28,4 @@ Provides a config 'KISSmetrics' on the main application to configure the API key
       Ext.KISSmetrics.record('view3');
       Ext.KISSmetrics.clearIdentity();
 
+The KISSmetrics API documentation can be found [here](http://support.kissmetrics.com/apis/javascript/).
