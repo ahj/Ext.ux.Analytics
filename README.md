@@ -23,9 +23,12 @@ Provides a config 'KISSmetrics' on the main application to configure the API key
       });
  
       Ext.KISSmetrics.identify('user@mycompany.com');
-      Ext.KISSmetrics.record('view1', { id: 123234 });
-      Ext.KISSmetrics.record('view2', { id: 6454 });
-      Ext.KISSmetrics.record('view3');
+      Ext.KISSmetrics.record('KM event1', { id: 123234 });
+      Ext.KISSmetrics.record('KM event2', { id: 6454 });
+      Ext.KISSmetrics.record('KM event3');
+      Ext.KISSmetrics.record('KM event1', { id: 100000 });
       Ext.KISSmetrics.clearIdentity();
 
 The KISSmetrics API documentation can be found [here](http://support.kissmetrics.com/apis/javascript/).
+
+If you attempt to record a KISSmetrics event/action that hasn't been listed in the main Application-level KISSmetrics config object then a warning is output on Ext.log...these log messages do nothing in a release/production build.

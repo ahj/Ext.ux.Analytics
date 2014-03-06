@@ -33,9 +33,10 @@
  *      });
  * 
  *      Ext.KISSmetrics.identify('user@mycompany.com');
- *      Ext.KISSmetrics.record('view1', { id: 123234 });
- *      Ext.KISSmetrics.record('view2', { id: 6454 });
- *      Ext.KISSmetrics.record('view3');
+ *      Ext.KISSmetrics.record('KM event1', { id: 123234 });
+ *      Ext.KISSmetrics.record('KM event2', { id: 6454 });
+ *      Ext.KISSmetrics.record('KM event3');
+ *      Ext.KISSmetrics.record('KM event1', { id: 100000 });
  *      Ext.KISSmetrics.clearIdentity();
  *
  * @docauthor Alun Huw Jones
@@ -110,13 +111,13 @@ Ext.define('Ext.ux.KISSmetrics', {
         );
         
         Ext.onReady(function() {
-        	// Ensure that the globally-scoped KISSmetrics variables are defined
-        	var _kmq = _kmq || [],
-        	    _kmk = _kmk || me.apiKey;
+       	    // Ensure that the globally-scoped KISSmetrics variables are defined
+            var _kmq = _kmq || [],
+                _kmk = _kmk || me.apiKey;
 
-        	// Get the KISSmetrics JavaScript loaded
-        	me._kms('//i.kissmetrics.com/i.js');
-        	me._kms('//doug1izaerwt3.cloudfront.net/' + _kmk + '.1.js');
+            // Get the KISSmetrics JavaScript loaded
+       	    me._kms('//i.kissmetrics.com/i.js');
+       	    me._kms('//doug1izaerwt3.cloudfront.net/' + _kmk + '.1.js');
         });
     },
 
@@ -130,24 +131,32 @@ Ext.define('Ext.ux.KISSmetrics', {
             events = config.events || [];
         
         if (!config.key) {
-    		Ext.log.error('km: api key is missing from config');
-        	return false;
+    	    Ext.log.error('km: api key is missing from config');
+            return false;
         }
         
         me.apiKey = config.key;
 
         if (!Ext.isArray(config.events)) {
-    		Ext.log.warn('km: events in config is not an array');
+    	    Ext.log.warn('km: events in config is not an array');
     		
-    		// reset to empty array since configured value is invalid
-    		events = [];
+    	    // reset to empty array since configured value is invalid
+    	    events = [];
         }
         	
         me.events = events;
         	
         me.configured = true;
     },
-    
+
+    /**
+     * Method provided by KISSmetrics that is used to load in to the current
+     * page the KISSmetrics JavaScript code needed to support reading the
+     * _kmq queue and pushing items found there to the KISSmetrics servers
+     * using Ajax calls.
+     *
+     * @param {String} url  The url of a JavaScript file to be loaded
+     */
     _kms: function (url) {
         setTimeout(function() {
     	    var d = document,
@@ -171,70 +180,114 @@ Ext.define('Ext.ux.KISSmetrics', {
      */
     identify: function(user) {
     	var me = this,
-    		args = ['identifty'];
+    	    args = ['identifty'];
 
         if (!Ext.isString(user)) {
-    		Ext.log.error('km identify: user arg is not a string');
-        	return false;
+    	    Ext.log.error('km identify: user arg is not a string');
+       	    return false;
         }
         
       	args.push(user);
 	
-		_kmq.push(args);
-		
-		me.fireEvent('km_identity', user);
-		
-		return true;
+	_kmq.push(args);
+
+	me.fireEvent('km_identity', user);
+
+	return true;
     },
     
+    /**
+     * Set additional properties about the user, which you can use to segment
+     * groups of people into cohorts.
+     * 
+     * @param {Object} properties An object of key value pairs to associate
+     *                            with the current user
+     * @return {Boolean}  true if the function was successful otherwise false
+     */
     set: function(properties) {
     	var me = this,
     	    args = ['set'];
     	
     	if (!properties || !Ext.isObject(properties)) {
-    		Ext.log.error('km set: properties arg is not an object');
-    		return false;
+    	    Ext.log.error('km set: properties arg is not an object');
+    	    return false;
     	}
 
     	args.push(properties);
     	
-		_kmq.push(args);
+        _kmq.push(args);
+	
+        me.fireEvent('km_set', properties);
 		
-		me.fireEvent('km_set', properties);
-		
-		return true;
+        return true;
     },
     
+    /**
+     * If the current person is already 'identified', this clears their
+     * identity and generates a new anonymous ID for their browser. Does
+     * nothing if the current person is currently 'anonymous'.
+     * 
+     * @return {Boolean}  true if the function was successful otherwise false
+     */
     clearIdentity: function() {
     	var me = this,
     	    args = ['clearIdentity'];
     	
-		_kmq.push(args);
+	_kmq.push(args);
 		
-		me.fireEvent('km_clear_identity', user);
+	me.fireEvent('km_clear_identity', user);
 		
-		return true;    	
+	return true;    	
     },
     
+    /**
+     * Records an event.
+     * 
+     * @param {String} event      The name of the event to record
+     * @param {Object} properties An optional set of properties to associate
+     *                            with the recorded event
+     * @return {Boolean}  true if the function was successful otherwise false
+     */
     record: function(event, properties) {
     	var me = this,
-    	    args = [ 'record'];
+    	    args = ['record'],
+            events = me.events;
 
     	if (!event || !Ext.isString(event)) {
-    		Ext.log.error('km record: event arg is not a string');
-    		return false;
-    	}
-    	
-    	args.push(event);
-    	
-    	if (!properties || !Ext.isObject(properties)) {
-    		Ext.log.error('km record: properties arg for event ' + event + ' is not an object');
-    		return false;
+    	    Ext.log.error('km record: event arg is not a string');
+    	    return false;
     	}
 
-    	args.push(properties);
-    	
-  		_kmq.push(args);
+        // Only produce warnings if the user has registered
+        // at least one event in the global config
+        if (events && (events.length > 0)) {
+            var i,
+                match = false;
+
+            for (i = 0; i < events.length; i++) {
+                if (event == (event[i] || '')) {
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched) {
+                Ext.log.warn('km record: unknown event ' + event);
+            }
+        }
+
+    	args.push(event);
+ 
+    	if (properties) { 
+            if (!Ext.isObject(properties)) {
+                Ext.log.error('km record: properties arg for event ' + event + ' is not an object');
+                return false;
+            }
+
+    	    args.push(properties);
+    	}
+
+  	_kmq.push(args);
   		
         me.fireEvent('km_record', event, properties);
         
