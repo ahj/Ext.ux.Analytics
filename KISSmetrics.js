@@ -61,8 +61,11 @@ Ext.define('Ext.ux.KISSmetrics', {
     },
     
     /**
-     * Processes the routes for the given app and initializes Ext.History. Also parses
-     * the initial token, generally main, home, index, etc.
+     * Processes the config for the given app.
+     * Sets up the KISSmetrics api key and any events that were defined.
+     * Lastly, it sets up the _kmk and _kmq global variables and registers 
+     * an onReady function to load the necessary KISSmetrics JavaScript in
+     * to the page.
      * @private
      */
     init: function(app) {
