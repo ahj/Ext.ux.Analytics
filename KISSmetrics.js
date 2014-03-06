@@ -1,6 +1,6 @@
 /*!
  * Ext.ux.KISSmetrics
- * http://github.com/brunotavares/Ext.ux.Router
+ * http://github.com/ahj/Ext.ux.KISSmetrics
  *
  * Copyright 2014 Alun Huw Jones
  * Released under the MIT license
