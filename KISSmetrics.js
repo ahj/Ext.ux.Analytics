@@ -168,7 +168,7 @@ Ext.define('Ext.ux.KISSmetrics', {
     	    
     	    s.type = 'text/javascript';
     	    s.async = true;
-    	    s.src = u;
+    	    s.src = url;
     	    f.parentNode.insertBefore(s, f);
     	}, 1);
     },
