@@ -1,6 +1,6 @@
 /*!
  * Ext.ux.KISSmetrics
- * http://github.com/ahj/Ext.ux.KISSmetrics
+ * http://github.com/ahj/Ext.ux.Analytics
  *
  * Copyright 2014 Alun Huw Jones
  * Released under the MIT license

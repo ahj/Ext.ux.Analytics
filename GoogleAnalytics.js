@@ -1,6 +1,6 @@
 /*!
  * Ext.ux.GoogleAnalytics
- * http://github.com/ahj/Ext.ux.KISSmetrics
+ * http://github.com/ahj/Ext.ux.Analytics
  *
  * Copyright 2014 Alun Huw Jones
  * Released under the MIT license
@@ -19,7 +19,7 @@
  *              'Ext.ux': 'app/ux'
  *          },
  *          GoogleAnalytics: {
- *              key: 'your api key'
+ *              trackingCode: 'your tracking code'
  *          }
  *      });
  * 
@@ -79,7 +79,7 @@ Ext.define('Ext.ux.GoogleAnalytics', {
                     ? https://ssl.google-analytics.com/ga.js
                     : http://www.google-analytics.com/ga.js;
 
-            _q.push(['_setAccount', me.apiKey]);
+            _q.push(['_setAccount', me.trackingCode]);
             _q.push(['trackPageview']);
 
        	    me._gas(url);
@@ -95,12 +95,12 @@ Ext.define('Ext.ux.GoogleAnalytics', {
             config = app.GoogleAnalytics,
             events = config.events || [];
         
-        if (!config.key) {
-    	    Ext.log.error('km: api key is missing from config');
+        if (!config.trackingCode) {
+    	    Ext.log.error('ga: tracking code is missing from config');
             return false;
         }
         
-        me.apiKey = config.key;
+        me.trackingCode = config.trackingCode;
 
         me.configured = true;
     },
@@ -113,7 +113,7 @@ Ext.define('Ext.ux.GoogleAnalytics', {
      *
      * @param {String} url  The url of a JavaScript file to be loaded
      */
-    _gas: function (url) {
+    _gas: function(url) {
         setTimeout(function() {
     	    var d = document,
     	        f = d.getElementsByTagName('script')[0],
